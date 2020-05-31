@@ -1,0 +1,89 @@
+#! python3
+
+from selenium import webdriver  # install these modules if necessary
+from selenium.webdriver.common.keys import Keys
+import time, pyperclip
+
+browser = webdriver.Chrome()  # variable for interacting with Google Chrome browser
+browser.get('https://translate.google.co.uk/')  # the URL you wish to access (modify as required)
+browser.implicitly_wait(1)  # wait X seconds until elements are ready (modify as required)
+time.sleep(1)
+
+print('Which phrase do you wish to translate?')
+inputPhrase = input()
+
+print('Which language is this phrase in?')
+inputLang = input()
+
+print('Which language do you wish to translate to?')
+outputLang = input()
+
+inputLangElem = browser.find_element_by_css_selector('.sl-sugg > div:nth-child(2) > div:nth-child(1)')  # finds an element on the page using its unique CSS selector (some browsers will make this available this within the 'Inspect' console)
+inputLangElem.click()  # click the selected element
+
+searchInputLangElem = browser.find_element_by_css_selector('#sl_list-search-box')  # finds a search box element
+searchInputLangElem.send_keys(str(inputLang))  # send keystrokes to the search box element, containing user input
+
+try:  # preferred step
+    searchInputLangElem.send_keys(Keys.RETURN)  # sends a RETURN keystroke to the search box element to perform the search
+
+    inputPhraseElem = browser.find_element_by_css_selector('#source')
+    inputPhraseElem.send_keys(str(inputPhrase))  # send keystrokes to the search box element, containing user input
+
+    print(r'''Translating "''' + str(inputPhrase) + r'''" from ''' + (str(inputLang)).capitalize() + '...')
+except:  # if preferred step fails, then this alternative step is performed
+    detectInputLangElem = browser.find_element_by_css_selector('.sl-sugg > div:nth-child(2) > div:nth-child(1)')
+    detectInputLangElem.click()
+
+    inputPhraseElem = browser.find_element_by_css_selector('#source')
+    inputPhraseElem.send_keys(str(inputPhrase))
+
+    print(r'''Could not find "''' + str(inputPhrase) + r'''" in ''' + (str(inputLang)).capitalize() + '. Auto-detecting language instead...')
+
+browser.implicitly_wait(1)
+time.sleep(1)
+
+outputLangElem = browser.find_element_by_css_selector('.tl-more')
+outputLangElem.click()
+
+browser.implicitly_wait(1)
+time.sleep(1)
+
+searchOutputLangElem = browser.find_element_by_css_selector('#tl_list-search-box')
+
+try:
+    searchOutputLangElem.send_keys(str(outputLang))
+    searchOutputLangElem.send_keys(Keys.RETURN)
+
+    browser.implicitly_wait(1)
+    time.sleep(1)
+
+    closeNotificationElem = browser.find_element_by_css_selector('.tlid-dismiss-button')
+    closeNotificationElem.click()
+
+    browser.implicitly_wait(1)
+    time.sleep(1)
+
+    copyButtonElem = browser.find_element_by_css_selector('.tlid-copy-translation-button')
+    copyButtonElem.click()
+
+    print('The ' + (str(outputLang)).capitalize() + ' translation is: \n' + pyperclip.paste())
+
+except:
+    searchOutputLangElem.clear()  # clears the contents of the search box element, to allow new content to be written to it
+    searchOutputLangElem.send_keys('English')
+    searchOutputLangElem.send_keys(Keys.RETURN)
+
+    browser.implicitly_wait(1)
+    time.sleep(1)
+
+    closeNotificationElem = browser.find_element_by_css_selector('.tlid-dismiss-button')
+    closeNotificationElem.click()
+
+    browser.implicitly_wait(1)
+    time.sleep(1)
+
+    copyButtonElem = browser.find_element_by_css_selector('.tlid-copy-translation-button')
+    copyButtonElem.click()
+
+    print(r'''Could not find your preferred translation. Here's the English translation instead:''' + '\n' + pyperclip.paste())
