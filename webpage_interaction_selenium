@@ -87,3 +87,5 @@ except:
     copyButtonElem.click()
 
     print(r'''Could not find your preferred translation. Here's the English translation instead:''' + '\n' + pyperclip.paste())
+ 
+browser.close()
