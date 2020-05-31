@@ -8,3 +8,5 @@ This script is an example of how to use the Selenium module and the Chrome webdr
 * extract outputs
 
 The example used involves accessing the Google Translate website and translating a custom phrase from one custom language to another custom language, using error-handling to deliver alternative translations where the preferred languages don't exist.
+
+Though this is a simple example, it demonstrates some of the useful applications of Selenium in automating UI testing.
